@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">appProduct</string>
+    <string name="saludo">Bienvenido</string>
+    <string name="titulo1">Sistema de productos</string>
+    <string name="refProduct">referencia del producto</string>
+    <string name="desProduct">Descripción del producto</string>
+
+</resources>

@@ -50,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
         list = findViewById(R.id.idList);
         message = findViewById(R.id.tvMessage);
 
+
+
         //definir el array dapater
         ArrayAdapter<String>adpTypeRef = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_checked,arrayTypeRef);
 
@@ -57,6 +59,60 @@ public class MainActivity extends AppCompatActivity {
         refType.setAdapter(adpTypeRef);
 
         //eventos de cada boton
+
+        edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String mRef= reference.getText().toString();
+                String mDesc = description.getText().toString();
+                int mPrice = Integer.parseInt (coste.getText().toString());
+                int mRefType = refType.getSelectedItem().toString().equals("Comestible") ? 1 : 0;
+                if(checkData(mRef,mDesc, String.valueOf(mPrice))){
+                    //actualizar el producto con todos los datos
+                    SQLiteDatabase osdbWrite = oDB.getWritableDatabase();
+                    osdbWrite.execSQL("Update product SET description ='"+ mDesc +"', price = " +mPrice+", typeRef = " +mRefType+" where reference = '"+mRef+"' ");
+
+                    message.setTextColor(Color.GREEN);
+                    message.setText("¡EL PRODUCTO HA SIDO ACTUALIZADO CON EXITO!");
+                    
+                }else {
+                    message.setTextColor(Color.RED);
+                    message.setText("Llena por favor todos los campos para actualizar...!");
+                }
+            }
+        });
+
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!reference.getText().toString().isEmpty())
+                {
+                    //buscar la refencia del producto a travez del metodo searchReference
+                    if(searchReference(reference.getText().toString()).size()>0){
+                        //tomar los datos del objeto oProduct l a cual esta global
+                        //asingar el contenido de cada atributo a cada editText y spinner
+                        description.setText(oProduct.getDescription());
+
+                        //convertir de integrer a texto
+                        coste.setText(String.valueOf(oProduct.getPrice()));
+
+                        //seleccionar la opcion del spinner correspondiente para:
+                        //1: comestible
+                        //0: No comestible
+                        refType.setSelection(oProduct.getTypeRef() == 1 ? 0 : 1);
+                    }
+                    else {
+                        message.setTextColor(Color.RED);
+                        message.setText("La referencia no existe, intenta con otra...");
+                    }
+                }
+                else {
+                    message.setTextColor(Color.RED);
+                    message.setText("Ingrese la referencia a buscar");
+                }
+            }
+        });
+
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -2,7 +2,9 @@ package com.example.appproduct;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -59,6 +61,46 @@ public class MainActivity extends AppCompatActivity {
         refType.setAdapter(adpTypeRef);
 
         //eventos de cada boton
+
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String mRef = reference.getText().toString();
+
+                if(!mRef.isEmpty()){
+                    if(searchReference(mRef).size()>0){
+                        //advertencia y confirmacion para eliminar un dato
+                        new AlertDialog.Builder(MainActivity.this).setTitle("Confirmar borrado de datos")
+                                .setMessage("¿Estas seguro que deseas eliminar este producto?")
+                                .setPositiveButton("Eliminar", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        //eliminar producto
+                                        SQLiteDatabase osdbWrite = oDB.getWritableDatabase();
+                                        osdbWrite.delete("product", "reference = '"+mRef+"'",new String[]{mRef});
+                                        osdbWrite.close();
+
+                                        reference.setText("");
+                                        description.setText("");
+                                        coste.setText("");
+                                        refType.setSelection(0);
+                                        message.setTextColor(Color.GREEN);
+                                        message.setText("El producto ha sido eliminado con exito");
+                                    }
+                                })
+                                .setNegativeButton("Cancelar",null)
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .show();
+                    }else{
+                        message.setTextColor(Color.RED);
+                        message.setText("La referencia que intnentas eliminar no existe...");
+                    }
+                }else {
+                    message.setTextColor(Color.RED);
+                    message.setText("Ingresa por favor la referencia que deseas borrar...!");
+                }
+            }
+        });
 
         edit.setOnClickListener(new View.OnClickListener() {
             @Override
